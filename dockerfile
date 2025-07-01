@@ -1,14 +1,12 @@
-# Use a small, fast Java 17 base image
-FROM eclipse-temurin:17-jdk-alpine
-
-# Create app directory
+# === Stage 1: Build JAR ===
+FROM maven:3.9.4-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy the built JAR file into the image
-COPY target/*.jar app.jar
-
-# Expose the port your Spring Boot app runs on
+# === Stage 2: Run app ===
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Run the jar file
 ENTRYPOINT ["java", "-jar", "app.jar"]
