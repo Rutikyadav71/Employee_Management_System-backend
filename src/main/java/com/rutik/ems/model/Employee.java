@@ -26,10 +26,10 @@ public class Employee {
     private String email;
 
     @Column(nullable = false)
-    private String password;  // ✅ Now stored in DB
+    private String password;
 
     @Column(nullable = false)
-    private String role;      // ✅ 'ADMIN' or 'USER', stored in DB
+    private String role;
 
     @Column(nullable = false)
     private long salary;

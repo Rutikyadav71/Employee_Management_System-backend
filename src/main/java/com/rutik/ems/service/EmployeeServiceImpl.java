@@ -1,14 +1,19 @@
 package com.rutik.ems.service;
 
 import com.rutik.ems.model.Employee;
+import com.rutik.ems.model.Notification;
 import com.rutik.ems.repository.EmployeeRepository;
+import com.rutik.ems.repository.NotificationRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 
@@ -24,6 +29,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    private NotificationRepository notificationRepo;
+
+    @Value("${app.email.enabled:true}")
+    private boolean emailEnabled;
+
     @Override
     public List<Employee> getAll() {
         return repo.findAll();
@@ -36,21 +47,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee create(Employee emp) {
-        // ✅ Save plain password for email before encoding
+
         String plainPassword = emp.getPassword();
 
-        // ✅ Encode the password
         emp.setPassword(passwordEncoder.encode(plainPassword));
 
-        // ✅ Save employee
         Employee savedEmp = repo.save(emp);
+        notificationRepo.save(new Notification(
+                "Employee added: " + savedEmp.getName()
+        ));
 
-        // ✅ Send email
-        try {
-            sendWelcomeEmail(emp.getEmail(), emp.getName(), plainPassword);
-        } catch (MessagingException e) {
-            System.err.println("❌ Failed to send email to " + emp.getEmail());
-            e.printStackTrace();
+        if (emailEnabled) {
+            try {
+                sendWelcomeEmail(emp.getEmail(), emp.getName(), plainPassword);
+            } catch (MessagingException e) {
+                System.err.println("Failed to send email to " + emp.getEmail());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Email disabled. Skipping email to: " + emp.getEmail());
         }
 
         return savedEmp;
@@ -84,7 +99,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-    // ✅ Send email method
+    @Override
+    public List<Employee> searchEmployees(String keyword) {
+        return repo.searchEmployees(keyword);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMultiple(List<Integer> empIds) {
+        repo.deleteAllByEmpIdIn(empIds);
+    }
+
     private void sendWelcomeEmail(String toEmail, String name, String password) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -101,6 +126,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
 
         mailSender.send(message);
-        System.out.println("✅ Email sent successfully to " + toEmail);
+        System.out.println("Email sent successfully to " + toEmail);
     }
 }

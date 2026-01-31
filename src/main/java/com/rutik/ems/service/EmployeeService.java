@@ -4,6 +4,7 @@ import com.rutik.ems.model.Employee;
 import java.util.List;
 
 public interface EmployeeService {
+
     List<Employee> getAll();
 
     Employee getById(int empId);
@@ -14,4 +15,7 @@ public interface EmployeeService {
 
     void delete(int empId);
 
+    List<Employee> searchEmployees(String keyword);
+
+    void deleteMultiple(List<Integer> empIds);
 }

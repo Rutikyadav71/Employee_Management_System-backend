@@ -4,11 +4,13 @@ import com.rutik.ems.model.Leave;
 import com.rutik.ems.model.LeaveStatus;
 import com.rutik.ems.service.LeaveService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
-@CrossOrigin(origins = "https://ry-ems.vercel.app")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/leaves")
 public class LeaveController {
@@ -16,45 +18,58 @@ public class LeaveController {
     @Autowired
     private LeaveService leaveService;
 
-    // Apply for leave (defaults to PENDING)
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public Leave applyLeave(@RequestBody Leave leave) {
         return leaveService.applyLeave(leave);
     }
 
-    // Get all leave requests
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<Leave> getAllLeaves() {
         return leaveService.getAllLeaves();
     }
 
-    // Get leave history by empId (not DB id)
+    @PreAuthorize("hasRole('ADMIN') or @employeeSecurity.isSelf(#empId)")
     @GetMapping("/employee/{empId}")
     public List<Leave> getLeavesByEmpId(@PathVariable("empId") int empId) {
         return leaveService.getLeavesByEmpId(empId);
     }
 
-    // Update leave status (generic way)
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public Leave updateLeaveStatus(@PathVariable Long id, @RequestBody Leave leave) {
         return leaveService.updateLeaveStatus(id, leave.getStatus());
     }
 
-    // Approve leave
     @PutMapping("/{id}/approve")
     public Leave approveLeave(@PathVariable Long id) {
         return leaveService.updateLeaveStatus(id, LeaveStatus.APPROVED);
     }
 
-    // Reject leave
     @PutMapping("/{id}/reject")
     public Leave rejectLeave(@PathVariable Long id) {
         return leaveService.updateLeaveStatus(id, LeaveStatus.REJECTED);
     }
 
-    // Delete a leave request
     @DeleteMapping("/{id}")
     public void deleteLeave(@PathVariable Long id) {
         leaveService.deleteLeave(id);
     }
+
+    @GetMapping("/admin/export")
+    public List<Leave> exportLeavesForMLTraining() {
+        return leaveService.exportLeavesForTraining();
+    }
+
+    @GetMapping("/admin/{id}/prediction")
+    public Map<String, Object> getLeaveMLInsight(@PathVariable Long id) {
+        return leaveService.getLeaveMLInsight(id);
+    }
+
+    @GetMapping("/{id}")
+    public Leave getLeaveById(@PathVariable Long id) {
+        return leaveService.getLeaveById(id);
+    }
+
 }
