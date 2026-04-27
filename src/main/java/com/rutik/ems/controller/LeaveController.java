@@ -15,10 +15,10 @@ import java.util.Map;
 @RequestMapping("/api/leaves")
 public class LeaveController {
 
-    @Autowired
-    private LeaveService leaveService;
+    @Autowired private LeaveService leaveService;
 
-    @PreAuthorize("hasRole('USER')")
+    // Both USER and ADMIN can apply leave
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping
     public Leave applyLeave(@RequestBody Leave leave) {
         return leaveService.applyLeave(leave);
@@ -71,5 +71,4 @@ public class LeaveController {
     public Leave getLeaveById(@PathVariable Long id) {
         return leaveService.getLeaveById(id);
     }
-
 }

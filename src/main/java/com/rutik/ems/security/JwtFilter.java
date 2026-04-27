@@ -33,25 +33,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-
-            if (jwtUtil.isTokenValid(token)) {
-
-                String email = jwtUtil.extractEmail(token);
-                String role = jwtUtil.extractRole(token); // 🔴 KEY LINE
-
-                SimpleGrantedAuthority authority =
-                        new SimpleGrantedAuthority(role);
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                List.of(authority) // 🔴 ROLE ADDED
-                        );
-
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authentication);
-            }
+            try {
+                if (jwtUtil.isTokenValid(token)) {
+                    String email = jwtUtil.extractEmail(token);
+                    String role  = jwtUtil.extractRole(token);
+                    // Normalize: Spring's hasRole('X') expects authority "ROLE_X"
+                    if (role != null && !role.startsWith("ROLE_")) {
+                        role = "ROLE_" + role;
+                    }
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    email, null, List.of(new SimpleGrantedAuthority(role)));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            } catch (Exception ignored) {}
         }
 
         filterChain.doFilter(request, response);

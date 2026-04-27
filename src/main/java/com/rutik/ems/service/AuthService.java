@@ -12,43 +12,30 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
-    @Autowired
-    private AdminRepository adminRepository;
+    @Autowired private AdminRepository adminRepository;
+    @Autowired private EmployeeRepository employeeRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    // ✅ ADMIN AUTH
     public Admin adminLogin(LoginRequest request) {
+        Admin admin = adminRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid admin credentials"));
 
-        Admin admin = adminRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() ->
-                        new RuntimeException("Invalid admin credentials"));
-
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                admin.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
             throw new RuntimeException("Invalid admin credentials");
+        }
+
+        if (Boolean.TRUE.equals(admin.getFrozen())) {
+            throw new RuntimeException("ACCOUNT_FROZEN: Your admin account has been frozen. Contact the other administrator.");
         }
 
         return admin;
     }
 
-    // ✅ EMPLOYEE AUTH
     public Employee employeeLogin(LoginRequest request) {
+        Employee emp = employeeRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid employee credentials"));
 
-        Employee emp = employeeRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() ->
-                        new RuntimeException("Invalid employee credentials"));
-
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                emp.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), emp.getPassword())) {
             throw new RuntimeException("Invalid employee credentials");
         }
 

@@ -32,7 +32,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private NotificationRepository notificationRepo;
 
-    @Value("${app.email.enabled:true}")
+    @Value("${app.email.enabled}")
     private boolean emailEnabled;
 
     @Override
