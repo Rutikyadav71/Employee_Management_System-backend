@@ -15,7 +15,7 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // allows cookies
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // your frontend
+        config.setAllowedOrigins(Arrays.asList("https://ry-ems.vercel.app")); // your frontend
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setMaxAge(3600L); // 1 hour

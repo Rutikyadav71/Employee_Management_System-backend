@@ -13,7 +13,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins="https://ry-ems.vercel.app")
 public class AdminController {
 
     @Autowired AdminRepository adminRepository;

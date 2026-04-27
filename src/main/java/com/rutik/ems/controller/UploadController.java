@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/upload")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins="https://ry-ems.vercel.app")
 public class UploadController {
     @Autowired private CloudinaryService cloudinaryService;
     @Autowired private EmployeeRepository employeeRepository;

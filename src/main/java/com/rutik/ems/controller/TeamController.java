@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/teams")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://ry-ems.vercel.app")
 public class TeamController {
 
     @Autowired TeamRepository repo;

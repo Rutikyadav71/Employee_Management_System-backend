@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://ry-ems.vercel.app")
 @RestController
 @RequestMapping("/api/leaves")
 public class LeaveController {

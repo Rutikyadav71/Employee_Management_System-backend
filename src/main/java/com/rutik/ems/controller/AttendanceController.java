@@ -14,7 +14,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/attendance")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://ry-ems.vercel.app")
 public class AttendanceController {
 
     @Autowired AttendanceRepository repo;
