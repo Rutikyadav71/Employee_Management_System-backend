@@ -45,7 +45,8 @@ public class SecurityConfig {
                     "/api/admin/login",
                     "/api/admin/register",
                     "/api/admin/exists",
-                    "/ws/**"
+                    "/ws/**",
+                        "/api/health"
                 ).permitAll()
                 // Upload endpoints — authenticated (any valid token) but NOT admin-only
                 // Must come before anyRequest().authenticated() to take effect
