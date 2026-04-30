@@ -51,11 +51,7 @@ public class CloudinaryService {
                 "use_filename",false,"unique_filename",false));
 
             String secureUrl = (String) r.get("secure_url");
-            // Add fl_attachment so browser downloads with original filename and correct format
-            String safeDl    = origName.replaceAll("[^a-zA-Z0-9._-]","_");
-            String dlUrl     = secureUrl.replace("/raw/upload/","/raw/upload/fl_attachment:"+safeDl+"/");
-
-            result.put("url", dlUrl);
+            result.put("url", secureUrl);
             result.put("isImage", false);
         }
         result.put("fileName", origName);
